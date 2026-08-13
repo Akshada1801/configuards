@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up - Configuards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+
+<body class="auth-body">
+
+<div class="auth-container">
+
+    <div class="auth-left">
+
+        <div class="auth-branding">
+            <div class="brand-icon">🛡️</div>
+            <h1>CONFIGUARDS</h1>
+            <p class="tagline">Cloud Security Posture Management</p>
+        </div>
+
+        <div class="auth-features">
+
+            <div class="feature-item">
+                <span class="feature-icon">🔍</span>
+                <div>
+                    <h3>16 Security Checks</h3>
+                    <p>Across S3, EC2, IAM and Security Groups — all automated</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <div>
+                    <h3>Auto-Remediation</h3>
+                    <p>HIGH issues fixed instantly. MEDIUM with approval. LOW guided.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <span class="feature-icon">🔐</span>
+                <div>
+                    <h3>Your AWS, Your Data</h3>
+                    <p>Connect your own AWS account — full isolation per user</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <div>
+                    <h3>Live Compliance Score</h3>
+                    <p>Real-time security posture with downloadable PDF reports</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="auth-stats">
+            <div class="auth-stat">
+                <span class="auth-stat-num">16</span>
+                <span class="auth-stat-label">Checks</span>
+            </div>
+
+            <div class="auth-stat">
+                <span class="auth-stat-num">4</span>
+                <span class="auth-stat-label">Services</span>
+            </div>
+
+            <div class="auth-stat">
+                <span class="auth-stat-num">Free</span>
+                <span class="auth-stat-label">Always</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="auth-right">
+
+        <div class="auth-card">
+
+            <div class="auth-card-header">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">
+                    Connect your AWS account and start securing it
+                </p>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-error">
+                <span>⚠️</span> {{ error }}
+            </div>
+            {% endif %}
+
+            {% if success %}
+            <div class="alert alert-success">
+                <span>✓</span> {{ success }}
+            </div>
+            {% endif %}
+
+
+            <!-- EMAIL VERIFICATION -->
+            <div class="form-group">
+                <label>Email Address</label>
+
+                <div class="input-wrapper">
+                    <span class="input-icon">📧</span>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        form="signupForm"
+                        value="{{ email or '' }}"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        form="sendOtpForm"
+                        class="verify-btn"
+                    >
+                        Send OTP
+                    </button>
+                </div>
+            </div>
+
+
+            {% if otp_sent or email_verified %}
+
+            <div class="form-group">
+                <label>Email OTP</label>
+
+                <div class="input-wrapper">
+                    <span class="input-icon">🔢</span>
+
+                    <input
+                        type="text"
+                        name="email_otp"
+                        form="verifyOtpForm"
+                        maxlength="6"
+                        placeholder="Enter 6-digit OTP"
+                    >
+
+                    <button
+                        type="submit"
+                        form="verifyOtpForm"
+                        class="verify-btn"
+                    >
+                        Verify
+                    </button>
+                </div>
+            </div>
+
+            {% endif %}
+
+
+            {% if email_verified %}
+            <div class="verification-status">
+                ✓ Email verified
+            </div>
+            {% endif %}
+
+
+            <!-- MAIN SIGNUP FORM -->
+            <form
+                method="POST"
+                class="auth-form"
+                id="signupForm"
+            >
+
+                <div class="form-group">
+                    <label>Full Name</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+
+                        <input
+                            type="text"
+                            name="fullname"
+                            value="{{ fullname or '' }}"
+                            placeholder="Your full name"
+                            required
+                        >
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Mobile Number</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">📱</span>
+
+                        <input
+                            type="tel"
+                            name="mobile"
+                            value="{{ mobile or '' }}"
+                            placeholder="+91 XXXXX XXXXX"
+                            pattern="(\+91[\s-]?)?[6-9][0-9]{9}"
+                            title="Enter a valid 10-digit Indian mobile number"
+                            required
+                        >
+                    </div>
+
+                    <small class="verification-note">
+                        ✓ Number format will be validated. No SMS is required.
+                    </small>
+                </div>
+
+
+                <div class="form-group">
+                    <label>AWS Access Key ID</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔑</span>
+
+                        <input
+                            type="text"
+                            name="aws_access_key"
+                            placeholder="AKIAIOSFODNN7EXAMPLE"
+                            required
+                        >
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label>AWS Secret Access Key</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">🗝️</span>
+
+                        <input
+                            type="password"
+                            name="aws_secret_key"
+                            placeholder="Your secret access key"
+                            required
+                        >
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label>AWS Region</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">🌍</span>
+
+                        <select name="aws_region" required>
+
+                            <optgroup label="🇮🇳 India">
+                                <option value="ap-south-1">
+                                    Asia Pacific (Mumbai) — ap-south-1
+                                </option>
+                                <option value="ap-south-2">
+                                    Asia Pacific (Hyderabad) — ap-south-2
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🌏 Asia Pacific">
+                                <option value="ap-southeast-1">
+                                    Asia Pacific (Singapore) — ap-southeast-1
+                                </option>
+                                <option value="ap-southeast-2">
+                                    Asia Pacific (Sydney) — ap-southeast-2
+                                </option>
+                                <option value="ap-northeast-1">
+                                    Asia Pacific (Tokyo) — ap-northeast-1
+                                </option>
+                                <option value="ap-northeast-2">
+                                    Asia Pacific (Seoul) — ap-northeast-2
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🌍 Europe">
+                                <option value="eu-west-1">
+                                    Europe (Ireland) — eu-west-1
+                                </option>
+                                <option value="eu-west-2">
+                                    Europe (London) — eu-west-2
+                                </option>
+                                <option value="eu-central-1">
+                                    Europe (Frankfurt) — eu-central-1
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🌎 US East">
+                                <option value="us-east-1">
+                                    US East (N. Virginia) — us-east-1
+                                </option>
+                                <option value="us-east-2">
+                                    US East (Ohio) — us-east-2
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🌎 US West">
+                                <option value="us-west-1">
+                                    US West (N. California) — us-west-1
+                                </option>
+                                <option value="us-west-2">
+                                    US West (Oregon) — us-west-2
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🌎 South America">
+                                <option value="sa-east-1">
+                                    South America (São Paulo) — sa-east-1
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="🇨🇦 Canada">
+                                <option value="ca-central-1">
+                                    Canada (Central) — ca-central-1
+                                </option>
+                            </optgroup>
+
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Password</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a strong password"
+                            required
+                        >
+
+                        <span
+                            class="toggle-password"
+                            onclick="togglePassword('password','icon1')"
+                        >
+                            <i id="icon1" class="eye-icon">👁️</i>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            required
+                        >
+
+                        <span
+                            class="toggle-password"
+                            onclick="togglePassword('confirm_password','icon2')"
+                        >
+                            <i id="icon2" class="eye-icon">👁️</i>
+                        </span>
+                    </div>
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="auth-btn"
+                    {% if not email_verified %}disabled{% endif %}
+                >
+                    <span>Create Account</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+
+            </form>
+
+
+            <!-- SEND OTP FORM -->
+            <form
+                method="POST"
+                id="sendOtpForm"
+                style="display:none;"
+            >
+                <input type="hidden" name="action" value="send_email_otp">
+                <input
+                    type="hidden"
+                    name="email"
+                    id="sendOtpEmail"
+                >
+            </form>
+
+
+            <!-- VERIFY OTP FORM -->
+            <form
+                method="POST"
+                id="verifyOtpForm"
+                style="display:none;"
+            >
+                <input
+                    type="hidden"
+                    name="action"
+                    value="verify_email"
+                >
+
+                <input
+                    type="hidden"
+                    name="email"
+                    id="verifyEmail"
+                >
+            </form>
+
+
+            <div class="auth-divider">
+                <span>secure signup</span>
+            </div>
+
+
+            <div class="auth-footer">
+                <p>
+                    Already have an account?
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="auth-link"
+                    >
+                        Sign in →
+                    </a>
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function togglePassword(id, iconId) {
+
+    const pwd = document.getElementById(id);
+    const icon = document.getElementById(iconId);
+
+    pwd.type = pwd.type === "password"
+        ? "text"
+        : "password";
+
+    icon.textContent =
+        pwd.type === "password"
+            ? "👁️"
+            : "🚫";
+}
+
+
+/*
+ * Keep the email in the hidden OTP forms synchronized with
+ * the email field in the visible signup form.
+ */
+const emailInput = document.getElementById("email");
+
+function syncEmail() {
+
+    if (!emailInput) return;
+
+    document.getElementById("sendOtpEmail").value =
+        emailInput.value;
+
+    document.getElementById("verifyEmail").value =
+        emailInput.value;
+}
+
+if (emailInput) {
+
+    emailInput.addEventListener("input", syncEmail);
+
+    syncEmail();
+}
+
+</script>
+
+</body>
+</html>

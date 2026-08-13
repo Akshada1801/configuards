@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link active">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">Security Overview</h1>
+                <p class="page-subtitle">Real-time AWS infrastructure security posture</p>
+            </div>
+            <div class="page-header-right">
+                <button id="scanBtn" onclick="scanResources()" class="btn-primary">
+                    <span class="btn-icon">🔍</span> Run Security Scan
+                </button>
+                <button onclick="clearResolved()" class="btn-secondary">
+                    <span class="btn-icon">🧹</span> Clear Resolved
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-card stat-high">
+                <div class="stat-icon warning">🔥</div>
+                <div class="stat-info">
+                    <h3>{{ stats.high }}</h3>
+                    <p>High Severity</p>
+                </div>
+                <div class="stat-trend">Critical</div>
+            </div>
+            <div class="stat-card stat-medium">
+                <div class="stat-icon medium">⚠️</div>
+                <div class="stat-info">
+                    <h3>{{ stats.medium }}</h3>
+                    <p>Medium Severity</p>
+                </div>
+                <div class="stat-trend">Needs Action</div>
+            </div>
+            <div class="stat-card stat-low">
+                <div class="stat-icon low">ℹ️</div>
+                <div class="stat-info">
+                    <h3>{{ stats.low }}</h3>
+                    <p>Low Severity</p>
+                </div>
+                <div class="stat-trend">Monitor</div>
+            </div>
+            <div class="stat-card stat-resolved">
+                <div class="stat-icon success">✅</div>
+                <div class="stat-info">
+                    <h3>{{ stats.resolved }}</h3>
+                    <p>Resolved</p>
+                </div>
+                <div class="stat-trend">Fixed</div>
+            </div>
+            <div class="stat-card stat-compliance">
+                <div class="stat-icon compliance">🎯</div>
+                <div class="stat-info">
+                    <h3>{{ stats.compliance }}%</h3>
+                    <p>Compliance Score</p>
+                </div>
+                <div class="stat-trend">Overall</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-content">
+                <div class="section-header">
+                    <div>
+                        <h2>Recent Security Findings</h2>
+                        <p class="section-subtitle">Latest issues detected across your AWS resources</p>
+                    </div>
+                    <a href="{{ url_for('findings') }}" class="section-link">View All →</a>
+                </div>
+                <div class="findings-grid">
+                    {% for f in findings %}
+                    <div class="finding-card finding-{{ f.severity|lower }}">
+                        <div class="finding-header">
+                            <div class="finding-meta">
+                                <span class="finding-resource-type">{{ f.resource }}</span>
+                                <span class="finding-name">{{ f.name }}</span>
+                            </div>
+                            <span class="severity {{ f.severity|lower }}">{{ f.severity|upper }}</span>
+                        </div>
+                        <p class="finding-issue">{{ f.issue }}</p>
+                        <div class="finding-footer">
+                            <span class="status {{ f.status|lower|replace(' ', '-') }}">{{ f.status|upper }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card compliance-card">
+                    <h3>🎯 Compliance Score</h3>
+                    <div class="compliance-meter">
+                        <div class="compliance-circle">
+                            <span class="compliance-score">{{ stats.compliance }}%</span>
+                        </div>
+                        <p class="compliance-label">Overall Security Posture</p>
+                        <div class="compliance-breakdown">
+                            <div class="cb-item"><span class="cb-dot high"></span><span>High: {{ stats.high }}</span></div>
+                            <div class="cb-item"><span class="cb-dot medium"></span><span>Medium: {{ stats.medium }}</span></div>
+                            <div class="cb-item"><span class="cb-dot low"></span><span>Low: {{ stats.low }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>⚡ Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button onclick="scanResources()" class="qa-btn qa-primary">
+                            <span class="qa-icon">🔍</span>
+                            <div class="qa-text"><strong>Scan Resources</strong><small>Run full AWS security scan</small></div>
+                        </button>
+                        <a href="{{ url_for('findings') }}" class="qa-btn qa-secondary">
+                            <span class="qa-icon">📋</span>
+                            <div class="qa-text"><strong>View Findings</strong><small>See all security issues</small></div>
+                        </a>
+                        <a href="{{ url_for('reports') }}" class="qa-btn qa-secondary">
+                            <span class="qa-icon">📊</span>
+                            <div class="qa-text"><strong>Reports</strong><small>Download security reports</small></div>
+                        </a>
+                        <button onclick="clearResolved()" class="qa-btn qa-success">
+                            <span class="qa-icon">🧹</span>
+                            <div class="qa-text"><strong>Clear Resolved</strong><small>Remove fixed findings</small></div>
+                        </button>
+                    </div>
+                    <p class="sidebar-note">ℹ️ JUST RESOLVED → RESOLVED after 1 hour</p>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>🕐 Recent Activity</h3>
+                    <div class="activity-list">
+                        {% for activity in recent_activity %}
+                        <div class="activity-item">
+                            <span class="activity-dot"></span>
+                            <div class="activity-body">
+                                <p class="activity-text">{{ activity.text }}</p>
+                                <span class="activity-time">{{ activity.time }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='css/theme-switcher.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+        });
+
+        function scanResources() {
+            const btn = document.getElementById('scanBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-icon">⏳</span> Scanning...';
+            fetch('/scan', { method: 'POST', headers: {'Content-Type': 'application/json'} })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-icon">🔍</span> Run Security Scan';
+                if (data.success) { alert(data.message); location.reload(); }
+                else alert('Error: ' + data.message);
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-icon">🔍</span> Run Security Scan';
+                alert('Error: ' + err);
+            });
+        }
+
+        function clearResolved() {
+            if (!confirm('Remove all resolved findings?')) return;
+            fetch('/clear-resolved', { method: 'POST', headers: {'Content-Type': 'application/json'} })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { alert(data.message); location.reload(); }
+                else alert('Error: ' + data.message);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+    "example@email.com": {
+        "fullname": "Example User",
+        "mobile": "1234567890",
+        "aws_builder_id": "example-builder-id",
+        "password": "password123",
+        "aws_access_key": "",
+        "aws_secret_key": "",
+        "aws_region": "us-east-1"
+    }
+}

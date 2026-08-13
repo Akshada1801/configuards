@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Configuards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="auth-branding">
+                <div class="brand-icon">🛡️</div>
+                <h1>CONFIGUARDS</h1>
+                <p class="tagline">Cloud Security Posture Management</p>
+            </div>
+            <div class="auth-features">
+                <div class="feature-item">
+                    <span class="feature-icon">🔍</span>
+                    <div>
+                        <h3>Real-time Threat Detection</h3>
+                        <p>Continuously scans S3, EC2, IAM & Security Groups for misconfigurations</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <div>
+                        <h3>Automated Remediation</h3>
+                        <p>High severity issues auto-fixed on scan. Medium & Low with one click</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <div>
+                        <h3>Compliance Scoring</h3>
+                        <p>Live compliance score with detailed security reports & audit trails</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔐</span>
+                    <div>
+                        <h3>Per-User AWS Integration</h3>
+                        <p>Connect your own AWS account — your credentials, your data, your control</p>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-stats">
+                <div class="auth-stat">
+                    <span class="auth-stat-num">16</span>
+                    <span class="auth-stat-label">Security Checks</span>
+                </div>
+                <div class="auth-stat">
+                    <span class="auth-stat-num">4</span>
+                    <span class="auth-stat-label">AWS Services</span>
+                </div>
+                <div class="auth-stat">
+                    <span class="auth-stat-num">100%</span>
+                    <span class="auth-stat-label">Automated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <h2>Welcome Back</h2>
+                    <p class="auth-subtitle">Sign in to your security dashboard</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-error">
+                    <span>⚠️</span> {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST" class="auth-form">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📧</span>
+                            <input type="email" name="username" placeholder="you@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <span class="toggle-password" onclick="togglePassword()">
+                                <i id="toggleIcon" class="eye-icon">👁️</i>
+                            </span>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-btn">
+                        <span>Sign In</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </form>
+
+                <div class="auth-divider"><span>secure login</span></div>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="{{ url_for('signup') }}" class="auth-link">Create one free →</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+            icon.textContent = pwd.type === 'password' ? '👁️' : '🚫';
+        }
+    </script>
+</body>
+</html>

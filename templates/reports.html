@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reports - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link active">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">Security Reports</h1>
+                <p class="page-subtitle">Downloadable security summaries and compliance reports</p>
+            </div>
+        </div>
+
+        <!-- Summary Stats Bar -->
+        <div class="report-summary-bar">
+            <div class="rsb-item">
+                <span class="rsb-num">{{ stats.total }}</span>
+                <span class="rsb-label">Total Findings</span>
+            </div>
+            <div class="rsb-divider"></div>
+            <div class="rsb-item">
+                <span class="rsb-num rsb-high">{{ stats.high }}</span>
+                <span class="rsb-label">High</span>
+            </div>
+            <div class="rsb-divider"></div>
+            <div class="rsb-item">
+                <span class="rsb-num rsb-medium">{{ stats.medium }}</span>
+                <span class="rsb-label">Medium</span>
+            </div>
+            <div class="rsb-divider"></div>
+            <div class="rsb-item">
+                <span class="rsb-num rsb-low">{{ stats.low }}</span>
+                <span class="rsb-label">Low</span>
+            </div>
+            <div class="rsb-divider"></div>
+            <div class="rsb-item">
+                <span class="rsb-num rsb-resolved">{{ stats.resolved }}</span>
+                <span class="rsb-label">Resolved</span>
+            </div>
+            <div class="rsb-divider"></div>
+            <div class="rsb-item">
+                <span class="rsb-num rsb-compliance">{{ stats.compliance }}%</span>
+                <span class="rsb-label">Compliance</span>
+            </div>
+        </div>
+
+        <div class="reports-grid">
+
+            <!-- Security Summary Report -->
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div class="report-icon">📋</div>
+                    <div>
+                        <h3>Security Summary</h3>
+                        <p class="report-date">Generated: {{ current_date }}</p>
+                    </div>
+                </div>
+                <div class="report-body">
+                    <div class="report-stats">
+                        <div class="stat">
+                            <span class="stat-number">{{ stats.total }}</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number critical">{{ stats.high }}</span>
+                            <span class="stat-label">High</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number warning">{{ stats.medium }}</span>
+                            <span class="stat-label">Medium</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number resolved-num">{{ stats.resolved }}</span>
+                            <span class="stat-label">Resolved</span>
+                        </div>
+                    </div>
+                    <div class="report-desc">
+                        <p>Complete breakdown of all security findings across S3, EC2, IAM, and Security Groups with remediation status.</p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='{{ url_for('download_report', report_type='security-summary') }}'" class="btn-download">
+                    ⬇️ Download PDF Report
+                </button>
+            </div>
+
+            <!-- Compliance Report -->
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div class="report-icon">🎯</div>
+                    <div>
+                        <h3>Compliance Report</h3>
+                        <p class="report-date">Last Updated: {{ current_date }}</p>
+                    </div>
+                </div>
+                <div class="report-body">
+                    <div class="compliance-score">
+                        <div class="score-circle">
+                            <span class="score">{{ stats.compliance }}%</span>
+                        </div>
+                        <p class="score-label">Overall Compliance Score</p>
+                    </div>
+                    <div class="report-desc">
+                        <p>Detailed compliance posture report with AWS security best practices alignment and remediation recommendations.</p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='{{ url_for('download_report', report_type='compliance') }}'" class="btn-download">
+                    ⬇️ Download PDF Report
+                </button>
+            </div>
+
+            <!-- Remediation Report -->
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div class="report-icon">🔧</div>
+                    <div>
+                        <h3>Remediation Report</h3>
+                        <p class="report-date">Last Updated: {{ current_date }}</p>
+                    </div>
+                </div>
+                <div class="report-body">
+                    <div class="report-stats">
+                        <div class="stat">
+                            <span class="stat-number resolved-num">{{ stats.resolved }}</span>
+                            <span class="stat-label">Fixed</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number critical">{{ stats.high }}</span>
+                            <span class="stat-label">Pending High</span>
+                        </div>
+                    </div>
+                    <div class="report-desc">
+                        <p>Full audit trail of all remediation actions taken — auto-fixed, manually resolved, and pending issues.</p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='{{ url_for('download_report', report_type='remediation') }}'" class="btn-download">
+                    ⬇️ Download PDF Report
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">My Profile</h1>
+                <p class="page-subtitle">Manage your account and AWS credentials</p>
+            </div>
+        </div>
+
+        <div class="profile-layout">
+
+            <!-- Left: Avatar Card -->
+            <div class="profile-sidebar">
+                <div class="profile-avatar-card">
+                    <div class="profile-avatar">{{ user[0]|upper }}</div>
+                    <h2 class="profile-name">{{ user_info.fullname }}</h2>
+                    <p class="profile-email">{{ user_info.email }}</p>
+                    <div class="profile-aws-status {% if aws_configured %}aws-ok{% else %}aws-warn{% endif %}">
+                        {% if aws_configured %}
+                            ✅ AWS Connected
+                        {% else %}
+                            ⚠️ AWS Not Configured
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="profile-nav-card">
+                    <a href="{{ url_for('settings') }}" class="profile-nav-link">⚙️ Settings</a>
+                    <a href="{{ url_for('change_password') }}" class="profile-nav-link">🔑 Change Password</a>
+                    <a href="{{ url_for('two_factor') }}" class="profile-nav-link">🔐 Two-Factor Auth</a>
+                    <a href="{{ url_for('logout') }}" class="profile-nav-link profile-nav-danger">🚪 Logout</a>
+                </div>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="profile-main">
+                <div class="profile-content">
+
+                    <!-- View Mode -->
+                    <div id="viewMode">
+                        <div class="profile-section-title">
+                            <h3>Account Information</h3>
+                            <button onclick="toggleEdit()" class="btn-edit">✏️ Edit Profile</button>
+                        </div>
+                        <div class="profile-info">
+                            <div class="info-row">
+                                <span class="info-label">👤 Full Name</span>
+                                <span class="info-value">{{ user_info.fullname }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📧 Email Address</span>
+                                <span class="info-value">{{ user_info.email }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📱 Mobile Number</span>
+                                <span class="info-value">{{ user_info.mobile }}</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-section-title" style="margin-top: 2rem;">
+                            <h3>AWS Configuration</h3>
+                        </div>
+                        <div class="profile-info">
+                            <div class="info-row">
+                                <span class="info-label">🔑 Access Key</span>
+                                <span class="info-value info-masked">••••••••••••••••</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🗝️ Secret Key</span>
+                                <span class="info-value info-masked">••••••••••••••••</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🌍 Region</span>
+                                <span class="info-value">{{ user_info.aws_region if user_info.aws_region else 'Not set' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🔗 Status</span>
+                                <span class="info-value {% if aws_configured %}info-success{% else %}info-warn{% endif %}">
+                                    {% if aws_configured %}✅ Connected & Active{% else %}⚠️ Not Configured{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode -->
+                    <form method="POST" id="editMode" style="display:none;">
+                        <div class="profile-section-title">
+                            <h3>Edit Account Information</h3>
+                            <button type="button" onclick="toggleEdit()" class="btn-cancel">✕ Cancel</button>
+                        </div>
+                        <div class="profile-info">
+                            <div class="info-row">
+                                <span class="info-label">👤 Full Name</span>
+                                <input type="text" name="fullname" value="{{ user_info.fullname }}" class="profile-input" required>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📧 Email</span>
+                                <span class="info-value">{{ user_info.email }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📱 Mobile</span>
+                                <input type="tel" name="mobile" value="{{ user_info.mobile }}" class="profile-input" required>
+                            </div>
+                        </div>
+                        <div class="profile-form-actions">
+                            <button type="submit" class="btn-primary">💾 Save Changes</button>
+                            <button type="button" onclick="toggleEdit()" class="btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+        });
+
+        function toggleEdit() {
+            const v = document.getElementById('viewMode');
+            const e = document.getElementById('editMode');
+            if (v.style.display === 'none') { v.style.display = 'block'; e.style.display = 'none'; }
+            else { v.style.display = 'none'; e.style.display = 'block'; }
+        }
+    </script>
+</body>
+</html>

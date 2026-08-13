@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">About Configuards</h1>
+                <p class="page-subtitle">Cloud Security Posture Management for AWS</p>
+            </div>
+        </div>
+
+        <!-- Hero Banner -->
+        <div class="about-hero">
+            <div class="about-hero-text">
+                <h2>Secure Your AWS Infrastructure</h2>
+                <p>Configuards continuously monitors your AWS environment for misconfigurations, security vulnerabilities, and compliance violations — then helps you fix them automatically.</p>
+            </div>
+            <div class="about-hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-num">16</span>
+                    <span class="hero-stat-label">Security Checks</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">4</span>
+                    <span class="hero-stat-label">AWS Services</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">3</span>
+                    <span class="hero-stat-label">Severity Levels</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">100%</span>
+                    <span class="hero-stat-label">Automated</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-card-icon">🔍</div>
+                <h3>Real-time Threat Detection</h3>
+                <p>Continuously scans S3 buckets, EC2 instances, IAM users, and Security Groups for misconfigurations and security vulnerabilities the moment they appear.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag">S3</span>
+                    <span class="about-tag">EC2</span>
+                    <span class="about-tag">IAM</span>
+                    <span class="about-tag">Security Groups</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">⚡</div>
+                <h3>Automated Remediation</h3>
+                <p>HIGH severity issues are auto-fixed the moment a scan runs. MEDIUM issues get a 30-second approval window. LOW severity issues provide guided manual fix steps.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag about-tag-high">HIGH → Auto</span>
+                    <span class="about-tag about-tag-medium">MEDIUM → Approve</span>
+                    <span class="about-tag about-tag-low">LOW → Manual</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">📊</div>
+                <h3>Compliance Scoring</h3>
+                <p>Get a live compliance score based on your current security posture. Download detailed PDF reports for audits, team reviews, and regulatory requirements.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag">PDF Reports</span>
+                    <span class="about-tag">Audit Trail</span>
+                    <span class="about-tag">Live Score</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">🔐</div>
+                <h3>Per-User AWS Integration</h3>
+                <p>Each user connects their own AWS account using their Access Key and Secret Key. Your credentials are stored securely and used only for your scans.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag">Your Credentials</span>
+                    <span class="about-tag">Your Data</span>
+                    <span class="about-tag">Your Control</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">🌍</div>
+                <h3>Multi-Region Support</h3>
+                <p>Scan AWS resources across all major regions including Mumbai, Hyderabad, Singapore, US East, EU West and more. Indian regions prioritized for local teams.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag">ap-south-1</span>
+                    <span class="about-tag">us-east-1</span>
+                    <span class="about-tag">eu-west-1</span>
+                    <span class="about-tag">+15 more</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">📋</div>
+                <h3>Security Best Practices</h3>
+                <p>All checks are based on AWS security best practices and CIS AWS Foundations Benchmark. Stay aligned with industry standards without manual effort.</p>
+                <div class="about-card-tags">
+                    <span class="about-tag">CIS Benchmark</span>
+                    <span class="about-tag">AWS Best Practices</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="about-tech">
+            <h3>Built With</h3>
+            <div class="tech-stack">
+                <div class="tech-item">🐍 Python / Flask</div>
+                <div class="tech-item">☁️ AWS boto3</div>
+                <div class="tech-item">🎨 Vanilla JS</div>
+                <div class="tech-item">📦 JSON Storage</div>
+                <div class="tech-item">🔒 Session Auth</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

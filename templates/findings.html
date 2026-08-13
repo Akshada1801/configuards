@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Findings - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link active">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">Security Findings</h1>
+                <p class="page-subtitle">All detected misconfigurations across your AWS infrastructure</p>
+            </div>
+            <div class="page-header-right">
+                <div class="findings-filter">
+                    <button class="filter-btn active" onclick="filterFindings('all')">All</button>
+                    <button class="filter-btn" onclick="filterFindings('high')">🔥 High</button>
+                    <button class="filter-btn" onclick="filterFindings('medium')">⚠️ Medium</button>
+                    <button class="filter-btn" onclick="filterFindings('low')">ℹ️ Low</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="findings-table-wrapper">
+                <table class="findings-table-el">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Resource</th>
+                            <th>Resource Name</th>
+                            <th>Issue Description</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in findings %}
+                        <tr id="finding-{{ loop.index }}" class="finding-row" data-severity="{{ f.severity|lower }}">
+                            <td class="td-num">{{ loop.index }}</td>
+                            <td>
+                                <div class="resource-badge resource-{{ f.resource|lower|replace(' ','') }}">
+                                    {{ f.resource }}
+                                </div>
+                            </td>
+                            <td class="td-name">{{ f.name }}</td>
+                            <td class="td-issue">{{ f.issue }}</td>
+                            <td><span class="severity {{ f.severity|lower }}">{{ f.severity|upper }}</span></td>
+                            <td><span class="status {{ f.status|lower|replace(' ', '-') }}">{{ f.status|upper }}</span></td>
+                            <td>
+                                {% if f.status|upper == 'OPEN' %}
+                                    {% if f.severity|upper == 'HIGH' %}
+                                        <span class="btn-auto">🤖 Auto-Fixed</span>
+                                    {% elif f.severity|upper == 'MEDIUM' %}
+                                        <button onclick="executeRemediation('{{ f.resource }}', '{{ f.name }}', '{{ f.issue }}', {{ loop.index }})" class="btn-remediate btn-medium">🔧 Remediate</button>
+                                    {% elif f.severity|upper == 'LOW' %}
+                                        <button onclick="manualRemediate('{{ f.resource }}', '{{ f.name }}', '{{ f.issue }}', {{ loop.index }})" class="btn-remediate btn-low">🔧 Manual Fix</button>
+                                    {% else %}
+                                        <span class="btn-info">—</span>
+                                    {% endif %}
+                                {% elif f.status|upper == 'JUST RESOLVED' %}
+                                    <span class="btn-just-resolved">✨ Just Fixed</span>
+                                {% else %}
+                                    <span class="btn-resolved">✓ Resolved</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remediation Modal -->
+    <div id="timerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">⏱️</div>
+            <h3>Remediation Approval</h3>
+            <p id="modalMessage"></p>
+            <div class="timer-display">
+                <span id="countdown">30</span>
+                <small>seconds remaining</small>
+            </div>
+            <div class="modal-actions">
+                <button onclick="approveRemediation()" class="btn-approve">✓ Approve</button>
+                <button onclick="denyRemediation()" class="btn-deny">✗ Deny</button>
+            </div>
+            <p class="timer-note">Auto-proceeds if no action taken</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='css/theme-switcher.js') }}"></script>
+    <script>
+        let currentRemediation = null, timerInterval = null, timeRemaining = 30;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+        });
+
+        function filterFindings(severity) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.finding-row').forEach(row => {
+                row.style.display = (severity === 'all' || row.dataset.severity === severity) ? '' : 'none';
+            });
+        }
+
+        function manualRemediate(resource, name, issue, index) {
+            if (!confirm(`🔧 Manual Fix Required\n\nResource: ${name}\nType: ${resource}\nIssue: ${issue}\n\nProceed?`)) return;
+            executeRemediation(resource, name, issue, index);
+        }
+
+        function approveRemediation() {
+            clearInterval(timerInterval);
+            document.getElementById('timerModal').style.display = 'none';
+            if (currentRemediation) executeRemediation(currentRemediation.resource, currentRemediation.name, currentRemediation.issue, currentRemediation.index);
+        }
+
+        function denyRemediation() {
+            clearInterval(timerInterval);
+            document.getElementById('timerModal').style.display = 'none';
+            alert('Remediation cancelled.');
+            currentRemediation = null;
+        }
+
+        function executeRemediation(resource, name, issue, index) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Fixing...';
+            fetch('/remediate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ resource_type: resource, resource_name: name, issue: issue })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    const row = document.getElementById(`finding-${index}`);
+                    row.querySelector('.status').textContent = 'RESOLVED';
+                    row.querySelector('.status').className = 'status resolved';
+                    row.querySelector('td:last-child').innerHTML = '<span class="btn-resolved">✓ Resolved</span>';
+                } else {
+                    alert('✗ ' + data.message);
+                    btn.disabled = false;
+                    btn.textContent = '🔧 Retry';
+                }
+            })
+            .catch(err => {
+                alert('✗ ' + err);
+                btn.disabled = false;
+                btn.textContent = '🔧 Retry';
+            });
+        }
+    </script>
+</body>
+</html>

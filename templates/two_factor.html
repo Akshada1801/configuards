@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Two-Factor Authentication - Configuards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="{{ url_for('dashboard') }}" style="color: white; text-decoration: none;">← &nbsp;&nbsp;CONFIGUARDS</a></div>
+        <div class="nav-menu">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ url_for('findings') }}" class="nav-link">Findings</a>
+            <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+            <a href="{{ url_for('feedback') }}" class="nav-link">Feedback</a>
+        </div>
+        <div class="nav-user">
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span>{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a href="{{ url_for('about') }}">About Our Services</a>
+                    <a href="{{ url_for('settings') }}">Settings</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="dashboard-container">
+        <div class="profile-content">
+            <h2><span class="highlight">Two-Factor Authentication</span></h2>
+            {% if success %}
+                <p style="color: #155724; background: #d4edda; padding: 10px; border-radius: 8px; font-weight: bold;">{{ success }}</p>
+            {% endif %}
+            <div class="settings-section">
+                <h3>Current Status</h3>
+                <p style="font-size: 18px; font-weight: bold; color: {% if two_factor_enabled %}#155724{% else %}#856404{% endif %};">
+                    {% if two_factor_enabled %}
+                        ✓ Two-Factor Authentication is ENABLED
+                    {% else %}
+                        ✗ Two-Factor Authentication is DISABLED
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="settings-section">
+                <h3>About Two-Factor Authentication</h3>
+                <p>Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification in addition to your password.</p>
+            </div>
+            
+            <form method="POST">
+                <button type="submit" style="margin-top: 20px;">
+                    {% if two_factor_enabled %}
+                        Disable Two-Factor Authentication
+                    {% else %}
+                        Enable Two-Factor Authentication
+                    {% endif %}
+                </button>
+            </form>
+            <p><a href="{{ url_for('settings') }}">Back to Settings</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    dropdownContent.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

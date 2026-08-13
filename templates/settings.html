@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings - Configuards</title>
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/aws-pro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switcher.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-brand"><a href="{{ url_for('dashboard') }}">🛡️ CONFIGUARDS</a></div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('findings') }}" class="nav-link">🔍 Findings</a>
+                <a href="{{ url_for('reports') }}" class="nav-link">📄 Reports</a>
+            </div>
+        </div>
+        <div class="nav-user">
+            <button class="theme-switcher-btn" onclick="openThemePopup()">🎨 <span>Theme</span></button>
+            <div class="nav-badge">AWS Connected</div>
+            <div class="profile-pic">{{ user[0]|upper }}</div>
+            <span class="nav-username">{{ user }}</span>
+            <div class="dropdown">
+                <button class="dropdown-btn">▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">👤 Profile</a>
+                    <a href="{{ url_for('settings') }}">⚙️ Settings</a>
+                    <a href="{{ url_for('about') }}">ℹ️ About</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}" class="dropdown-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">Settings</h1>
+                <p class="page-subtitle">Manage notifications, scanning preferences and security options</p>
+            </div>
+        </div>
+
+        <div class="settings-layout">
+
+            <!-- Left Nav -->
+            <div class="settings-sidebar">
+                <div class="settings-nav">
+                    <a href="#notifications" class="settings-nav-link active">🔔 Notifications</a>
+                    <a href="#scanning" class="settings-nav-link">🔍 Scanning</a>
+                    <a href="#security" class="settings-nav-link">🔐 Security</a>
+                    <a href="#privacy" class="settings-nav-link">🛡️ Privacy</a>
+                    <a href="#danger" class="settings-nav-link settings-nav-danger">⚠️ Danger Zone</a>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="settings-main">
+
+                <!-- Notifications -->
+                <div class="settings-section" id="notifications">
+                    <div class="settings-section-header">
+                        <h3>🔔 Notifications</h3>
+                        <p>Control how and when you receive security alerts</p>
+                    </div>
+                    <div class="settings-card">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Email Alerts</div>
+                                <div class="setting-description">Receive email notifications for critical findings</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Weekly Reports</div>
+                                <div class="setting-description">Get weekly security summary reports via email</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">SMS Alerts</div>
+                                <div class="setting-description">SMS notifications for high severity issues</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Push Notifications</div>
+                                <div class="setting-description">Browser push notifications for real-time alerts</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scanning -->
+                <div class="settings-section" id="scanning">
+                    <div class="settings-section-header">
+                        <h3>🔍 Scanning Preferences</h3>
+                        <p>Configure how Configuards scans your AWS resources</p>
+                    </div>
+                    <div class="settings-card">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Automatic Scans</div>
+                                <div class="setting-description">Run daily security scans automatically</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Real-time Monitoring</div>
+                                <div class="setting-description">Continuous resource monitoring between scans</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Include Archived Resources</div>
+                                <div class="setting-description">Scan archived and stopped resources</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Deep Scan Mode</div>
+                                <div class="setting-description">Perform comprehensive security analysis (slower)</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="settings-section" id="security">
+                    <div class="settings-section-header">
+                        <h3>🔐 Security</h3>
+                        <p>Manage your account security and authentication</p>
+                    </div>
+                    <div class="settings-card">
+                        <a href="{{ url_for('change_password') }}" class="security-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">🔑</span>
+                                <div>
+                                    <strong>Change Password</strong>
+                                    <small>Update your account password</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                        <a href="{{ url_for('two_factor') }}" class="security-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">📱</span>
+                                <div>
+                                    <strong>Two-Factor Authentication</strong>
+                                    <small>Add an extra layer of security</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="security-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">☁️</span>
+                                <div>
+                                    <strong>AWS Credentials</strong>
+                                    <small>Manage your AWS access keys</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                        <a href="#" class="security-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">🖥️</span>
+                                <div>
+                                    <strong>Session Management</strong>
+                                    <small>View and revoke active sessions</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Privacy -->
+                <div class="settings-section" id="privacy">
+                    <div class="settings-section-header">
+                        <h3>🛡️ Privacy</h3>
+                        <p>Control your data and privacy preferences</p>
+                    </div>
+                    <div class="settings-card">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Activity Logging</div>
+                                <div class="setting-description">Log all security scan and remediation actions</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Anonymous Analytics</div>
+                                <div class="setting-description">Allow anonymous usage analytics to improve the product</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Share Reports</div>
+                                <div class="setting-description">Allow report sharing with team members</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-section" id="danger">
+                    <div class="settings-section-header danger-header">
+                        <h3>⚠️ Danger Zone</h3>
+                        <p>Irreversible actions — proceed with caution</p>
+                    </div>
+                    <div class="settings-card danger-card">
+                        <a href="#" onclick="return confirm('Clear all scan history? This cannot be undone.')" class="security-action-btn danger-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">🗑️</span>
+                                <div>
+                                    <strong>Clear Scan History</strong>
+                                    <small>Remove all historical scan data</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                        <a href="#" onclick="return confirm('Disconnect your AWS account?')" class="security-action-btn danger-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">🔌</span>
+                                <div>
+                                    <strong>Disconnect AWS</strong>
+                                    <small>Remove your AWS credentials</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                        <a href="#" onclick="return confirm('Delete your account permanently? This cannot be undone!')" class="security-action-btn danger-action-btn">
+                            <div class="sab-left">
+                                <span class="sab-icon">💀</span>
+                                <div>
+                                    <strong>Delete Account</strong>
+                                    <small>Permanently delete your account and all data</small>
+                                </div>
+                            </div>
+                            <span class="sab-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+            });
+
+            // Highlight active nav link on scroll
+            const sections = document.querySelectorAll('.settings-section');
+            const navLinks = document.querySelectorAll('.settings-nav-link');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+                navLinks.forEach(l => {
+                    l.classList.remove('active');
+                    if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
